@@ -1,7 +1,7 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from versatileimagefield.fields import VersatileImageField, PPOIField
-from django.contrib.postgres.fields import ArrayField
+# from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
@@ -114,7 +114,7 @@ class Product(TimeStampedModel):
     is_part = models.BooleanField(_('Is part'), default=False)
     for_sale = models.BooleanField(_('For Sale'), default=False)
 
-    sales_areas = ArrayField(models.PositiveSmallIntegerField(), verbose_name=_('Sales Areas'),)
+    # sales_areas = ArrayField(models.PositiveSmallIntegerField(), verbose_name=_('Sales Areas'),)
     price = models.DecimalField(_('Product price'), max_digits=9, decimal_places=2)
 
     class Meta:
@@ -122,7 +122,7 @@ class Product(TimeStampedModel):
         verbose_name_plural = _('Products')
 
     def __str__(self):
-        return self.title
+        return self.title_en
 
 
 class Image(models.Model):
@@ -147,10 +147,20 @@ class Image(models.Model):
         verbose_name_plural = _('Images')
 
     def __str__(self):
-        return f'{self.product.title}-{self.id} image'
+        return f'{self.product.title_en}-{self.id} image'
 
 
-class Rating(models.Model):
+class SalesArea(models.Model):
+    product = models.ForeignKey(
+        to=Product,
+        verbose_name=_('Sales Area'),
+        related_name='sales_areas',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+
+class Rating(TimeStampedModel):
 
     """Rating model"""
 
@@ -163,8 +173,8 @@ class Rating(models.Model):
     )
     user = models.ForeignKey(
         to=User,
-        related_name='ratings',
         verbose_name=_('Rated user'),
+        related_name='ratings',
         on_delete=models.CASCADE
     )
     product = models.ForeignKey(

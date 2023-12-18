@@ -124,12 +124,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # DATABASES = {
 #     'default': {
@@ -142,16 +142,16 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ltcxncyz',
-        'USER': 'ltcxncyz', 
-        'PASSWORD': '9ny__3i9CsxSz4gBvy0Dk13hdc-pjKk5',
-        'HOST': 'satao.db.elephantsql.com' , 
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'ltcxncyz',
+#         'USER': 'ltcxncyz', 
+#         'PASSWORD': '9ny__3i9CsxSz4gBvy0Dk13hdc-pjKk5',
+#         'HOST': 'satao.db.elephantsql.com' , 
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
