@@ -5,19 +5,21 @@ from rest_flex_fields.views import FlexFieldsMixin
 from rest_flex_fields.utils import is_expanded
 from django_filters import rest_framework as filters
 
-from .models import Order
-from .serializers import OrderSerializer
 from .pagination import CustomPagination
 from .filters import OrderFilter
+from .models import Order
+from .serializers import OrderSerializer
 
 class OrderViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
 
+    """Order Model View Set"""
+
     serializer_class = OrderSerializer
     permission_classes = (AllowAny,)
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter,)
     filterset_class = OrderFilter
-    search_fields = ['first_name', 'last_name', 'phone']
+    search_fields = ['first_name', 'last_name', 'phone',]
     ordering_fields = ['created_at',]
     permit_list_expands = ['product',]
 

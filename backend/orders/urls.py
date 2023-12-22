@@ -1,7 +1,7 @@
-from rest_framework.routers import DefaultRouter
+from rest_framework import routers
 from .views import OrderViewSet
 
-router = DefaultRouter()
+router = routers.SimpleRouter()
 router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = router.urls

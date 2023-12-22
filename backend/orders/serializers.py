@@ -1,4 +1,4 @@
-from rest_flex_fields import FlexFieldsModelViewSet
+from rest_flex_fields import FlexFieldsModelSerializer
 
 from products.serializers import ProductSerializer
 from .models import Order
@@ -17,7 +17,7 @@ class OrderProductSerializer(ProductSerializer):
         )
 
 
-class OrderSerializer(FlexFieldsModelViewSet):
+class OrderSerializer(FlexFieldsModelSerializer):
 
     """Order Serializer"""
 
