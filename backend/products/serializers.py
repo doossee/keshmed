@@ -1,5 +1,5 @@
+from django.conf import settings
 from rest_framework import serializers
-from versatileimagefield.serializers import VersatileImageFieldSerializer
 from rest_flex_fields import FlexFieldsModelSerializer
 
 from .models import (
@@ -10,25 +10,36 @@ from .models import (
     Rating        
 )
 
+
 class BrandSerializer(serializers.ModelSerializer):
 
     """Brand Serializer"""
 
-    image = VersatileImageFieldSerializer(sizes='product_headshot')
+    thumbnail = serializers.ReadOnlyField(source="thumbnail.url")
+    medium_square_crop = serializers.ReadOnlyField(source="medium_square_crop.url")
 
     class Meta:
         model = Brand
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'description_en',
+            'description_ru',
+            'description_uz',
+            'country',
+            'image',
+            'thumbnail',
+            'medium_square_crop'
+        ]
 
 
-class AbstractCategorySerializer(FlexFieldsModelSerializer):
+class AbstractCategorySerializer(serializers.ModelSerializer):
 
     """Abstract Category Serializer"""
 
     class Meta:
         model = Category
-        depth = 5
-        fields = (
+        fields = [
             'id',
             'lft',
             'rght',
@@ -38,42 +49,40 @@ class AbstractCategorySerializer(FlexFieldsModelSerializer):
             'name_ru',
             'name_uz',
             'parent',
-        )
+        ]
 
 
-class CategorySerializer(AbstractCategorySerializer):
+class CategoryExpandSerializer(AbstractCategorySerializer):
+
+    """Category expand"""
+
+    class Meta(AbstractCategorySerializer.Meta):
+        depth = 5
+
+
+class CategoryTreeSerializer(AbstractCategorySerializer):
 
     """Category Serializer"""
-    
+
     children = serializers.SerializerMethodField()
-    
+
     def get_children(self, instance):
-        
+
         children = instance.get_children()
-        serializer = CategorySerializer(children, many=True)
+        serializer = CategoryTreeSerializer(children, many=True)
         return serializer.data
-    
-    class Meta:
-        model = Category
-        depth = 5
-        fields = (
-            'id',
-            'lft',
-            'rght',
-            'tree_id',
-            'level',
-            'name_en',
-            'name_ru',
-            'name_uz',
-            'children'
-        )
 
+    class Meta(AbstractCategorySerializer.Meta):
+        meta = AbstractCategorySerializer.Meta
+        fields = meta.fields + ['children']
+        
 
-class ImageSerializer(serializers.ModelSerializer):
+class ImageSerializer(FlexFieldsModelSerializer):
 
     """Image Serializer"""
 
-    image = VersatileImageFieldSerializer(sizes='product_headshot')
+    thumbnail = serializers.ReadOnlyField(source="thumbnail.url")
+    medium_square_crop = serializers.ReadOnlyField(source="medium_square_crop.url")
 
     class Meta:
         model = Image
@@ -81,36 +90,14 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(FlexFieldsModelSerializer):
-    
-    """Product Serializer"""
 
+    """Product Serializer"""
+    
     class Meta:
         model = Product
-        fields = (
-            'id',
-            'model',
-            'title_en',
-            'title_ru',
-            'title_uz',
-            'description_en',
-            'description_ru',
-            'description_uz',
-            'brand',
-            'category',
-            'condition',
-            'year',
-            'warranty',
-            'shipping_from',
-            'characteristics',
-            'is_part',
-            'for_sale',
-            'sales_areas',
-            'images',
-            'created_at',
-            'updated_at',
-        )
+        fields = '__all__'
         expandable_fields = {
             'brand': BrandSerializer,
-            'category': AbstractCategorySerializer,
+            'category': CategoryExpandSerializer,
             'images': (ImageSerializer, {'many': True}),
         }

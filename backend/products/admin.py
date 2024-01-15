@@ -5,7 +5,6 @@ from .models import (
     Category,
     Product,
     Image,
-    SalesArea,
     Rating
 )
 
@@ -23,10 +22,6 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(SalesArea)
-class SalesAreaAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Rating)

@@ -2,12 +2,14 @@ from rest_flex_fields import FlexFieldsModelSerializer
 
 from products.serializers import ProductSerializer
 from .models import Order
+from products.models import Product
 
 class OrderProductSerializer(ProductSerializer):
 
     """Changed product serializer"""
 
     class Meta:
+        model = Product
         fields = (
             'id',
             'model',

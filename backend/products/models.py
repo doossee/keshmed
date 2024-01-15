@@ -1,13 +1,15 @@
 from django.db import models
-from mptt.models import MPTTModel, TreeForeignKey
-from versatileimagefield.fields import VersatileImageField, PPOIField
-# from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import get_user_model
+
+from mptt.models import MPTTModel, TreeForeignKey
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 
-User = get_user_model() # Getting user model
+User = get_user_model() # Get user model
 
 
 class TimeStampedModel(models.Model):
@@ -25,15 +27,31 @@ class Brand(models.Model):
 
     """Brand Model"""
 
-    name = models.CharField(_('Brand name'),max_length=100)
+    name = models.CharField(_('Brand name'), max_length=100)
+
+    description_en = models.TextField(_('Brand description'))
+    description_ru = models.TextField(_('Описание бренда'))
+    description_uz = models.TextField(_('Brend tavsifi'))
+
     country = models.PositiveSmallIntegerField(_('Brand country'))
-    image = VersatileImageField(
-        _('Image'),
-        upload_to='images/',
-        ppoi_field='image_ppoi'
+
+    image = models.ImageField(
+        verbose_name=_('Image'),
+        upload_to='brands/',
     )
-    image_ppoi = PPOIField()
-    
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(100, 100)],
+        format='JPEG',
+        options={'quality': 60}
+    )
+    medium_square_crop = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 400)],
+        format='JPEG',
+        options={'quality': 80}
+    )
+
     class Meta:
         verbose_name = _('Brand')
         verbose_name_plural = _('Brands')
@@ -58,14 +76,14 @@ class Category(MPTTModel):
     )
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ['name_en', 'name_ru', 'name_uz']
     
     class Meta:
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 
 class Product(TimeStampedModel):
@@ -73,10 +91,10 @@ class Product(TimeStampedModel):
     """Product Model"""
 
     CONDITION_CHOICES = (
-        (1, _('New')),
-        (2, _('Used')),
-        (3, _('OpenBox')),
-        (4, _('Refurbished'))
+        ('new', _('New')),
+        ('used', _('Used')),
+        ('openbox', _('OpenBox')),
+        ('refurbished', _('Refurbished'))
     )
 
     model = models.CharField(_('Product model'), max_length=150)
@@ -85,9 +103,9 @@ class Product(TimeStampedModel):
     title_ru = models.CharField('Заголовок товара', max_length=250)
     title_uz = models.CharField('Mahsulot sarlavhasi', max_length=250)
 
-    description_en = models.TextField(_('Product description'))
-    description_ru = models.TextField(_('Описание товара'))
-    description_uz = models.TextField(_('Mahsulot tavsifi'))
+    description_en = models.TextField('Product description')
+    description_ru = models.TextField('Описание товара')
+    description_uz = models.TextField('Mahsulot tavsifi')
     
     brand = models.ForeignKey(
         to=Brand,
@@ -104,17 +122,18 @@ class Product(TimeStampedModel):
         null=True
     )
 
-    condition = models.PositiveSmallIntegerField(_('Product condition'), choices=CONDITION_CHOICES)
+    condition = models.CharField(_('Product condition'), max_length=11, choices=CONDITION_CHOICES)
     year = models.PositiveSmallIntegerField(_('Procuct year'), validators=[MinValueValidator(1000),MaxValueValidator(9999)])
     warranty = models.PositiveSmallIntegerField(_('Product warranty'))
+
     shipping_from = models.PositiveSmallIntegerField(_('Shipping Country'))
+    sales_areas = ArrayField(models.PositiveSmallIntegerField(), verbose_name=_('Sales Areas'),)
 
     characteristics = models.JSONField(_('Product characteristics'))
     
     is_part = models.BooleanField(_('Is part'), default=False)
     for_sale = models.BooleanField(_('For Sale'), default=False)
 
-    # sales_areas = ArrayField(models.PositiveSmallIntegerField(), verbose_name=_('Sales Areas'),)
     price = models.DecimalField(_('Product price'), max_digits=9, decimal_places=2)
 
     class Meta:
@@ -135,12 +154,23 @@ class Image(models.Model):
         related_name='images',
         on_delete=models.CASCADE
     )
-    image = VersatileImageField(
-        _('Image'),
-        upload_to='images/',
-        ppoi_field='image_ppoi'
+    
+    image = models.ImageField(
+        verbose_name=_('Image'),
+        upload_to='products/',
     )
-    image_ppoi = PPOIField()
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(100, 100)],
+        format='JPEG',
+        options={'quality': 60}
+    )
+    medium_square_crop = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 400)],
+        format='JPEG',
+        options={'quality': 80}
+    )
 
     class Meta:
         verbose_name = _('Image')
@@ -148,16 +178,6 @@ class Image(models.Model):
 
     def __str__(self):
         return f'{self.product.title_en}-{self.id} image'
-
-
-class SalesArea(models.Model):
-    product = models.ForeignKey(
-        to=Product,
-        verbose_name=_('Sales Area'),
-        related_name='sales_areas',
-        on_delete=models.SET_NULL,
-        null=True
-    )
 
 
 class Rating(TimeStampedModel):
