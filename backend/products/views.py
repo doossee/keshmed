@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
@@ -59,7 +59,7 @@ class ProductViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
     """Product Model View Set"""
 
     serializer_class = ProductSerializer
-    # permission_classes = [IsAdminUser|ReadOnly]
+    permission_classes = [IsAdminUser|ReadOnly]
     pagination_class = CustomPagination
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter,)
     filterset_class = ProductFilter
@@ -73,7 +73,6 @@ class ProductViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
         image_data = request.data.get('image')
 
         if image_data:
-            # Assuming your Image model has a 'product' ForeignKey
             image = Image(product=product, image=image_data)
             image.save()
 
