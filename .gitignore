@@ -1,7 +1,41 @@
-venv
+# Ignore database files
+*.sqlite3
+*.db
+
+# Ignore static and media files
+backend/static/
+backend/media/
+backend/dist/
+
+# Ignore only development files
+backend/core/settings/development*
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore environment files
 .env
-/backend/dist
-/backend/static
-/backend/media
-/backend/db.sqlite3
-**/__pycache__/
+
+# Ignore logs and other generated files
+/logs/
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db.sqlite3-journal
+
+# Ignore the virtual environment
+venv/
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore pycache directories
+__pycache__/
+
+# Ignore pytest cache
+.pytest_cache/
