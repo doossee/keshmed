@@ -3,9 +3,9 @@
 *.db
 
 # Ignore static and media files
-backend/static/
+backend/staticfiles/
 backend/media/
-backend/dist/
+
 
 # Ignore only development files
 backend/core/settings/development*
