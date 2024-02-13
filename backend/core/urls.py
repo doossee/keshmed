@@ -11,8 +11,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),                                                        
     path('auth/', include('djoser.urls.jwt')),                                                    
 
-    path('api/v1/', include('products.urls')),
-    path('api/v1/', include('orders.urls')),
+    path('api/v1/', include('src.urls')),
 
     re_path(r'^(?!media/).*$', TemplateView.as_view(template_name='index.html')),
 ]
