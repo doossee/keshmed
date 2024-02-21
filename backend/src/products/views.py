@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_flex_fields.views import FlexFieldsMixin
 from rest_flex_fields.utils import is_expanded
 
+from drf_multiple_serializer import ReadWriteSerializerMixin
+
 from django_filters import rest_framework as filters
 
 from .permissions import ReadOnly
@@ -19,7 +21,8 @@ from .models import (
     Image,
 )
 from .serializers import (
-    BrandSerializer,
+    BrandReadSerializer,
+    BrandWriteSerializer,
     AbstractCategorySerializer,
     CategoryTreeSerializer,
     ImageSerializer,
@@ -27,14 +30,18 @@ from .serializers import (
 )
 
 
-class BrandViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
+class BrandViewSet(ReadWriteSerializerMixin, FlexFieldsMixin, viewsets.ModelViewSet):
 
-    """Category Model View Set"""
+    """Brand Model View Set"""
 
     queryset = Brand.objects.all()
-    serializer_class = BrandSerializer
-    permission_classes = [IsAdminUser|ReadOnly]
-
+    serializer_classes = {
+        'read': BrandReadSerializer,
+        'write': BrandWriteSerializer
+    }
+    # permission_classes = [IsAdminUser|ReadOnly]
+    lookup_field = 'slug'
+    
 
 class CategoryViewSet(viewsets.ModelViewSet):
 
@@ -42,8 +49,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = AbstractCategorySerializer
-    permission_classes = [IsAdminUser|ReadOnly]
+    # permission_classes = [IsAdminUser|ReadOnly]
     pagination_class = CustomPagination
+    lookup_field = 'slug'
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter,)
     search_fields = ['name_uz', 'name_ru', 'name_en',]
 
@@ -59,8 +67,9 @@ class ProductViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
     """Product Model View Set"""
 
     serializer_class = ProductSerializer
-    permission_classes = [IsAdminUser|ReadOnly]
+    # permission_classes = [IsAdminUser|ReadOnly]
     pagination_class = CustomPagination
+    lookup_field = 'slug'
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter,)
     filterset_class = ProductFilter
     search_fields = ['title_en', 'title_ru', 'title_uz', 'model',]

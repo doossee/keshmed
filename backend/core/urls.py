@@ -11,9 +11,9 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),                                                        
     path('auth/', include('djoser.urls.jwt')),                                                    
 
-    path('api/v1/', include('src.urls')),
+    path('api/', include('src.urls')),
 
-    re_path(r'^(?!media/).*$', TemplateView.as_view(template_name='index.html')),
+    # re_path(r'^(?!media/).*$', TemplateView.as_view(template_name='index.html')),
 ]
 
 
