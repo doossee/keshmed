@@ -33,6 +33,7 @@ AUTH_USER_MODEL = 'accounts.AccountUser'
 # Application definition
 
 DJANGO_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,7 +54,6 @@ THIRD_PARTY_APPS = [
     'djoser',
     'corsheaders',
     'django_filters',
-    'imagekit',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
@@ -139,6 +139,8 @@ LANGUAGES = [
     ('ru', 'Russian'),
     ('uz', 'Uzbek'),
 ]
+
+MODELTRANSLATION_LANGUAGES = ('ru', 'uz')
 
 TIME_ZONE = 'UTC'
 

@@ -5,25 +5,24 @@ from .models import (
     Category,
     Product,
     Image,
-    Rating
 )
+
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
+    # prepopulated_fields = {"slug": ["name"]}
     pass
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    # prepopulated_fields = {"slug": ["name"]}
     pass
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    # prepopulated_fields = {"slug": ["title"]}
     pass
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(Rating)
-class RatingAdmin(admin.ModelAdmin):
     pass

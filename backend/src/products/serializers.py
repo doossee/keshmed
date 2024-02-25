@@ -7,16 +7,35 @@ from .models import (
     Category,
     Product,
     Image,
-    Rating        
 )
 
 
-class BrandSerializer(serializers.ModelSerializer):
+class BrandReadSerializer(serializers.ModelSerializer):
 
     """Brand Serializer"""
 
-    thumbnail = serializers.ReadOnlyField(source="thumbnail.url")
-    medium_square_crop = serializers.ReadOnlyField(source="medium_square_crop.url")
+    class Meta:
+        model = Brand
+        # fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'slug',
+            'description_en',
+            'description_ru',
+            'description_uz',
+            'get_image',
+            'get_thumbnail',
+            'get_medium_square_crop'
+        ]
+        # lookup_field = 'slug'
+        # extra_kwargs = {
+        #     'url': {'lookup_field': 'slug'}
+        # }
+
+class BrandWriteSerializer(serializers.ModelSerializer):
+    
+    """Brand serializer for create"""
 
     class Meta:
         model = Brand
@@ -26,10 +45,7 @@ class BrandSerializer(serializers.ModelSerializer):
             'description_en',
             'description_ru',
             'description_uz',
-            'country',
-            'image',
-            'thumbnail',
-            'medium_square_crop'
+            'image'
         ]
 
 
@@ -39,6 +55,7 @@ class AbstractCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
+        # fields = '__all__'
         fields = [
             'id',
             'lft',
@@ -48,6 +65,7 @@ class AbstractCategorySerializer(serializers.ModelSerializer):
             'name_en',
             'name_ru',
             'name_uz',
+            'slug',
             'parent',
         ]
 
@@ -77,16 +95,18 @@ class CategoryTreeSerializer(AbstractCategorySerializer):
         fields = meta.fields + ['children']
         
 
-class ImageSerializer(FlexFieldsModelSerializer):
+class ImageSerializer(serializers.ModelField):
 
     """Image Serializer"""
 
-    thumbnail = serializers.ReadOnlyField(source="thumbnail.url")
-    medium_square_crop = serializers.ReadOnlyField(source="medium_square_crop.url")
-
     class Meta:
         model = Image
-        fields = '__all__'
+        fields = [
+           'product',
+           'get_image',
+           'get_thumbnail',
+           'get_medium_square_crop',
+        ]
 
 
 class ProductSerializer(FlexFieldsModelSerializer):
@@ -97,7 +117,7 @@ class ProductSerializer(FlexFieldsModelSerializer):
         model = Product
         fields = '__all__'
         expandable_fields = {
-            'brand': BrandSerializer,
+            'brand': BrandReadSerializer,
             'category': CategoryExpandSerializer,
             'images': (ImageSerializer, {'many': True}),
         }
