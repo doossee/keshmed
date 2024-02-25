@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
@@ -57,18 +58,17 @@ class Brand(models.Model):
     
     def get_image(self):
         if self.image:
-            return 'http://127.0.0.1:8000' + self.image.url
+            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + self.image.url
         
     def get_thumbnail(self):
         if self.thumbnail:
-
-            return 'http://127.0.0.1:8000' + self.thumbnail.url
+            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.thumbnail.url
         else:
             return ''
         
     def get_medium_square_crop(self):
         if self.medium_square_crop:
-            return 'http://127.0.0.1:8000' + self.medium_square_crop.url
+            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.medium_square_crop.url
         else:
             return ''
 
@@ -209,17 +209,17 @@ class Image(models.Model):
 
     def get_image(self):
         if self.image:
-            return f'http://127.0.0.1:8000{self.image.url}'
+            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + self.image.url
         
     def get_thumbnail(self):
         if self.thumbnail:
-            return f'http://127.0.0.1:8000{self.thumbnail.url}'
+            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.thumbnail.url
         else:
             return ''
         
     def get_medium_square_crop(self):
         if self.medium_square_crop:
-            return f'http://127.0.0.1:8000{self.medium_square_crop.url}'
+            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.medium_square_crop.url
         else:
             return ''
 

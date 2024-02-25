@@ -62,8 +62,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-if DEBUG:
-    MIDDLEWARE +='debug_toolbar.middleware.DebugToolbarMiddleware',
+# if DEBUG:
+#     MIDDLEWARE +='debug_toolbar.middleware.DebugToolbarMiddleware',
 
 
 ROOT_URLCONF = 'core.urls'
