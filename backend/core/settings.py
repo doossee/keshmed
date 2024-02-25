@@ -45,8 +45,8 @@ THIRD_PARTY_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
-if DEBUG:
-    INSTALLED_APPS += 'debug_toolbar'
+# if DEBUG:
+#     INSTALLED_APPS += 'debug_toolbar'
 
 # Middleware defenition
 

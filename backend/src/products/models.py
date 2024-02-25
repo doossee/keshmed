@@ -1,13 +1,9 @@
-from io import BytesIO
-from PIL import Image as PImage
 from django.db import models
-from django.core.files import File
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
-from django.conf import settings
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
@@ -159,7 +155,6 @@ class Product(TimeStampedModel):
 
     characteristics = models.JSONField(_('Product characteristics'), null=True, blank=True)
     
-    is_part = models.BooleanField(_('Is part'), default=False)
     for_sale = models.BooleanField(_('For Sale'), default=False)
 
     price = models.DecimalField(_('Product price'), max_digits=9, decimal_places=2)
