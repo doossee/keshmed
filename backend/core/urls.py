@@ -12,10 +12,9 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),                                                    
 
     path('api/', include('src.urls')),
-
-    # re_path(r'^(?!media/).*$', TemplateView.as_view(template_name='index.html')),
 ]
 
 
 if settings.DEBUG:
+    urlpatterns += path("__debug__/", include("debug_toolbar.urls")),
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

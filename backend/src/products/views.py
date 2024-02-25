@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_flex_fields.views import FlexFieldsMixin
 from rest_flex_fields.utils import is_expanded
 
-from drf_multiple_serializer import ReadWriteSerializerMixin
+from drf_multiple_serializer import ReadWriteSerializerMixin, ActionBaseSerializerMixin
 
 from django_filters import rest_framework as filters
 
@@ -21,11 +21,11 @@ from .models import (
     Image,
 )
 from .serializers import (
-    BrandReadSerializer,
-    BrandWriteSerializer,
+    BrandRetrieveSerializer,
+    BrandCreateSerializer,
     AbstractCategorySerializer,
     CategoryTreeSerializer,
-    ImageSerializer,
+    ImageCreateSerializer,
     ProductSerializer,
 )
 
@@ -36,37 +36,43 @@ class BrandViewSet(ReadWriteSerializerMixin, FlexFieldsMixin, viewsets.ModelView
 
     queryset = Brand.objects.all()
     serializer_classes = {
-        'read': BrandReadSerializer,
-        'write': BrandWriteSerializer
+        'read': BrandRetrieveSerializer,
+        'write': BrandCreateSerializer
     }
     # permission_classes = [IsAdminUser|ReadOnly]
     lookup_field = 'slug'
     
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(ActionBaseSerializerMixin, viewsets.ModelViewSet):
 
     """Category Model View Set"""
 
     queryset = Category.objects.all()
-    serializer_class = AbstractCategorySerializer
+    serializer_classes = {
+        'default' : AbstractCategorySerializer,
+        'list_tree': CategoryTreeSerializer,
+    }
     # permission_classes = [IsAdminUser|ReadOnly]
     pagination_class = CustomPagination
     lookup_field = 'slug'
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter,)
     search_fields = ['name_uz', 'name_ru', 'name_en',]
 
-    @action(detail=False, methods=['GET'], serializer_class=CategoryTreeSerializer)
+    @action(detail=False, methods=['GET'])
     def list_tree(self, request):
         queryset = Category.objects.all().select_related('parent').filter(parent=None)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
 
-class ProductViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
+class ProductViewSet(ActionBaseSerializerMixin, FlexFieldsMixin, viewsets.ModelViewSet):
     
     """Product Model View Set"""
 
-    serializer_class = ProductSerializer
+    serializer_classes = {
+        'default': ProductSerializer,
+        'create_image': ImageCreateSerializer
+    }
     # permission_classes = [IsAdminUser|ReadOnly]
     pagination_class = CustomPagination
     lookup_field = 'slug'
@@ -77,15 +83,18 @@ class ProductViewSet(FlexFieldsMixin, viewsets.ModelViewSet):
     permit_list_expands = ['brand', 'category', 'images',]
 
     @action(detail=True, methods=['POST'])
-    def create_image(self, request, pk=None):
+    def create_image(self, request, slug=None):
         product = self.get_object()
+        
         image_data = request.data.get('image')
 
         if image_data:
             image = Image(product=product, image=image_data)
             image.save()
 
-            serializer = ImageSerializer(image)
+            action_serializer = self.get_serializer_class_by_action()
+            serializer = action_serializer(image)
+
             return Response(serializer.data, status=201)
         else:
             return Response({'detail': 'Image data is required.'}, status=400)

@@ -10,13 +10,12 @@ from .models import (
 )
 
 
-class BrandReadSerializer(serializers.ModelSerializer):
+class BrandRetrieveSerializer(serializers.ModelSerializer):
 
     """Brand Serializer"""
 
     class Meta:
         model = Brand
-        # fields = '__all__'
         fields = [
             'id',
             'name',
@@ -28,12 +27,9 @@ class BrandReadSerializer(serializers.ModelSerializer):
             'get_thumbnail',
             'get_medium_square_crop'
         ]
-        # lookup_field = 'slug'
-        # extra_kwargs = {
-        #     'url': {'lookup_field': 'slug'}
-        # }
+        
 
-class BrandWriteSerializer(serializers.ModelSerializer):
+class BrandCreateSerializer(serializers.ModelSerializer):
     
     """Brand serializer for create"""
 
@@ -93,11 +89,24 @@ class CategoryTreeSerializer(AbstractCategorySerializer):
     class Meta(AbstractCategorySerializer.Meta):
         meta = AbstractCategorySerializer.Meta
         fields = meta.fields + ['children']
-        
 
-class ImageSerializer(serializers.ModelField):
 
-    """Image Serializer"""
+class ImageCreateSerializer(serializers.ModelSerializer):
+
+    """Image write serialier"""
+
+    class Meta:
+        model = Image
+        fields = [
+            'id',
+            'product',
+            'image'
+        ]
+
+
+class ImageReadSerializer(FlexFieldsModelSerializer):
+
+    """Image read Serializer"""
 
     class Meta:
         model = Image
@@ -112,12 +121,14 @@ class ImageSerializer(serializers.ModelField):
 class ProductSerializer(FlexFieldsModelSerializer):
 
     """Product Serializer"""
+    brand = serializers.SlugField(read_only=True, source='brand.slug')
+    category = serializers.SlugField(read_only=True, source='category.slug')
     
     class Meta:
         model = Product
         fields = '__all__'
         expandable_fields = {
-            'brand': BrandReadSerializer,
+            'brand': BrandRetrieveSerializer,
             'category': CategoryExpandSerializer,
-            'images': (ImageSerializer, {'many': True}),
+            'images': (ImageReadSerializer, {'many': True}),
         }

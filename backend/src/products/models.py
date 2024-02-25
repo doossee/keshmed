@@ -7,6 +7,10 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from django.conf import settings
+
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -21,7 +25,7 @@ class Brand(models.Model):
     """Brand Model"""
 
     name = models.CharField(_('Brand name'), max_length=100, unique=True)
-    slug = models.SlugField(default='')
+    slug = models.SlugField(null=True, blank=True)
     
     description_en = models.TextField('Brand decription')
     description_ru = models.TextField('Описание брэнда')
@@ -29,17 +33,17 @@ class Brand(models.Model):
 
     image = models.ImageField(
         verbose_name=_('Image'),
-        upload_to='brands/',
+        upload_to='brands',
     )
     thumbnail = models.ImageField(
         verbose_name=_('Thumbnail'),
-        upload_to='thumbnail/brands/',
+        upload_to='brands/',
         blank=True,
         null=True,
     )
     medium_square_crop = models.ImageField(
         verbose_name=_("Medium square crop"),
-        upload_to='medium_square_crop/brands/',
+        upload_to='brands/',
         blank=True,
         null=True,
     )
@@ -61,39 +65,16 @@ class Brand(models.Model):
         
     def get_thumbnail(self):
         if self.thumbnail:
+
             return 'http://127.0.0.1:8000' + self.thumbnail.url
         else:
-            if self.image:
-                self.thumbnail = self.make_thumbnail(self.image)
-                self.save()
-
-                return 'http://127.0.0.1:8000' + self.thumbnail.url
-            else:
-                return ''
+            return ''
         
     def get_medium_square_crop(self):
         if self.medium_square_crop:
             return 'http://127.0.0.1:8000' + self.medium_square_crop.url
         else:
-            if self.image:
-                self.medium_square_crop = self.make_thumbnail(self.image, size=(400,400), quality=80)
-                self.save()
-
-                return 'http://127.0.0.1:8000' + self.medium_square_crop.url
-            else:
-                return ''
-
-    def make_thumbnail(self, image, size=(100, 100), quality=60):
-        img = PImage.open(image)
-        img = img.convert('RGB')
-        img.thumbnail(size)
-
-        thumb_io = BytesIO()
-        img.save(thumb_io, 'JPEG', quality=quality)
-
-        thumbnail = File(thumb_io, name=image.name)
-
-        return thumbnail
+            return ''
 
 
 class Category(MPTTModel):
@@ -103,7 +84,7 @@ class Category(MPTTModel):
     name_en = models.CharField('Category name', max_length=150)
     name_ru = models.CharField('Название категории', max_length=150)
     name_uz = models.CharField('Toifa nomi', max_length=150)
-    slug = models.SlugField(default='')
+    slug = models.SlugField(null=True, blank=True)
     
     parent = TreeForeignKey(
         to='self',
@@ -126,8 +107,8 @@ class Category(MPTTModel):
         if self.parent:
             self.slug = slugify(f"{self.name_en}-{self.parent.name_en}")
         else:
-            self.slug = slugify(self.name)
-        return super(self).save(*args, **kwargs)
+            self.slug = slugify(self.name_en)
+        return super().save(*args, **kwargs)
 
 
 class Product(TimeStampedModel):
@@ -146,14 +127,14 @@ class Product(TimeStampedModel):
     title_ru = models.CharField('Заголовок товара', max_length=250)
     title_uz = models.CharField('Mahsulot sarlavhasi', max_length=250)
 
-    slug = models.SlugField(default='')
+    slug = models.SlugField(null=True, blank=True)
 
     description_en = models.TextField('Product description')
     description_ru = models.TextField('Описание товара')
     description_uz = models.TextField('Mahsulot tavsifi')
     
     model = models.CharField(_('Product model'), max_length=150)
-    
+
     brand = models.ForeignKey(
         to=Brand,
         verbose_name=_('Product brand'),
@@ -211,17 +192,17 @@ class Image(models.Model):
         verbose_name=_('Image'),
         upload_to='products/',
     )
-    thumbnail = models.ImageField(
-        verbose_name=_('Thumbnail'),
-        upload_to='thumbnail/products/',
-        blank=True,
-        null=True,
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(100, 100)],
+        format='JPEG',
+        options={'quality': 60}
     )
-    medium_square_crop = models.ImageField(
-        verbose_name=_("Medium square crop"),
-        upload_to='medium_square_crop/products/',
-        blank=True,
-        null=True,
+    medium_square_crop = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 400)],
+        format='JPEG',
+        options={'quality': 80}
     )
 
     class Meta:
@@ -229,47 +210,23 @@ class Image(models.Model):
         verbose_name_plural = _('Images')
 
     def __str__(self):
-        return f'{self.product.title}-{self.id} image'
+        return f'{self.product.title_en}-{self.id} image'
 
     def get_image(self):
         if self.image:
-            return 'http://127.0.0.1:8000' + self.image.url
+            return f'http://127.0.0.1:8000{self.image.url}'
         
     def get_thumbnail(self):
         if self.thumbnail:
-            return 'http://127.0.0.1:8000' + self.thumbnail.url
+            return f'http://127.0.0.1:8000{self.thumbnail.url}'
         else:
-            if self.image:
-                self.thumbnail = self.make_thumbnail(self.image)
-                self.save()
-
-                return 'http://127.0.0.1:8000' + self.thumbnail.url
-            else:
-                return ''
+            return ''
         
     def get_medium_square_crop(self):
         if self.medium_square_crop:
-            return 'http://127.0.0.1:8000' + self.medium_square_crop.url
+            return f'http://127.0.0.1:8000{self.medium_square_crop.url}'
         else:
-            if self.image:
-                self.medium_square_crop = self.make_thumbnail(self.image, size=(400,400), quality=80)
-                self.save()
-
-                return 'http://127.0.0.1:8000' + self.medium_square_crop.url
-            else:
-                return ''
-
-    def make_thumbnail(self, image, size=(100, 100), quality=60):
-        img = PImage.open(image)
-        img = img.convert('RGB')
-        img.thumbnail(size)
-
-        thumb_io = BytesIO()
-        img.save(thumb_io, 'JPEG', quality=quality)
-
-        thumbnail = File(thumb_io, name=image.name)
-
-        return thumbnail
+            return ''
 
 
 # class Rating(TimeStampedModel):

@@ -1,1 +1,0 @@
-import{a as t}from"./index-2f7155ba.js";const n=async a=>t.get(`/api/v1/brands/?${a}`),r=async a=>t.post("/api/v1/brands/",a,{headers:{"Content-Type":"multipart-form/data"}}),d=async(a,s)=>t.put(`/api/v1/brands/${a}/`,{headers:{"Content-Type":"multipart-form/data"}}),p=async a=>t.delete(`/api/v1/brands/${a}`);export{r as c,p as d,n as g,d as u};
