@@ -20,9 +20,6 @@ class BrandRetrieveSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'slug',
-            'description_en',
-            'description_ru',
-            'description_uz',
             'get_image',
             'get_thumbnail',
             'get_medium_square_crop'
@@ -38,9 +35,6 @@ class BrandCreateSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            'description_en',
-            'description_ru',
-            'description_uz',
             'image'
         ]
 
