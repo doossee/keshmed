@@ -121,8 +121,9 @@ class ImageReadSerializer(FlexFieldsModelSerializer):
 class ProductSerializer(FlexFieldsModelSerializer):
 
     """Product Serializer"""
-    brand = serializers.SlugField(read_only=True, source='brand.slug')
-    category = serializers.SlugField(read_only=True, source='category.slug')
+
+    brand = serializers.SlugField(source='brand.slug')
+    category = serializers.SlugField(source='category.slug')
     
     class Meta:
         model = Product

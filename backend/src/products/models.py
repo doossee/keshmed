@@ -24,10 +24,6 @@ class Brand(models.Model):
     name = models.CharField(_('Brand name'), max_length=100, unique=True)
     slug = models.SlugField(null=True, blank=True)
     
-    description_en = models.TextField('Brand decription')
-    description_ru = models.TextField('Описание брэнда')
-    description_uz = models.TextField('Brend tavsifi')
-
     image = models.ImageField(
         verbose_name=_('Image'),
         upload_to='brands',
@@ -167,7 +163,7 @@ class Product(TimeStampedModel):
         return self.title_en
     
     def save(self, *args, **kwargs):
-        self.slug = slugify(f"{self.title_en}-{self.brand.name}-{self.category.name_en}")
+        self.slug = slugify(self.title_en)
         super().save(*args, **kwargs)
 
 
