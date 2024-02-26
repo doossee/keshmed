@@ -112,9 +112,9 @@ class ImageReadSerializer(FlexFieldsModelSerializer):
         ]
 
 
-class ProductCreateSerializer(serializers.ModelSerializer):
+class ProductDefaultSerializer(serializers.ModelSerializer):
 
-    """Product create serializer"""
+    """Product default serializer"""
 
     class Meta:
         model = Product
@@ -123,7 +123,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
 class ProductRetrieveSerializer(FlexFieldsModelSerializer):
 
-    """Product Serializer"""
+    """Product retrieve Serializer"""
 
     brand = serializers.SlugField(source='brand.slug')
     category = serializers.SlugField(source='category.slug')

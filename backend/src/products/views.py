@@ -26,7 +26,7 @@ from .serializers import (
     AbstractCategorySerializer,
     CategoryTreeSerializer,
     ImageCreateSerializer,
-    ProductCreateSerializer,
+    ProductDefaultSerializer,
     ProductRetrieveSerializer,
 )
 
@@ -71,8 +71,9 @@ class ProductViewSet(ActionBaseSerializerMixin, FlexFieldsMixin, viewsets.ModelV
     """Product Model View Set"""
 
     serializer_classes = {
-        'default': ProductRetrieveSerializer,
-        'create': ProductCreateSerializer,
+        'default': ProductDefaultSerializer,
+        'list': ProductRetrieveSerializer,
+        'retrieve': ProductRetrieveSerializer,
         'create_image': ImageCreateSerializer
     }
     # permission_classes = [IsAdminUser|ReadOnly]
