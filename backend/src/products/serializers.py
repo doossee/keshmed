@@ -118,7 +118,16 @@ class ImageReadSerializer(FlexFieldsModelSerializer):
         ]
 
 
-class ProductSerializer(FlexFieldsModelSerializer):
+class ProductCreateSerializer(serializers.ModelSerializer):
+
+    """Product create serializer"""
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+        
+
+class ProductRetrieveSerializer(FlexFieldsModelSerializer):
 
     """Product Serializer"""
 
