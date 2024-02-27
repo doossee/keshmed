@@ -38,7 +38,7 @@ class BrandViewSet(viewsets.ModelViewSet):
 
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
-    permission_classes = [IsAdminUser|ReadOnly]
+    # permission_classes = [IsAdminUser|ReadOnly]
     
 
 class CategoryViewSet(ActionBaseSerializerMixin, viewsets.ModelViewSet):

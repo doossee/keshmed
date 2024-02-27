@@ -8,11 +8,12 @@ from django.utils.text import slugify
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
-from webpfield.fields import WebPField
+# from webpfield.fields import WebPField
 
 from mptt.models import MPTTModel, TreeForeignKey
 
 from src.base.models import TimeStampedModel
+from src.base.fields import WEBPField
 
 
 User = get_user_model() # Get user model
@@ -22,9 +23,9 @@ class Brand(models.Model):
 
     """Brand Model"""
 
-    name = models.CharField(_('Brand name'), max_length=100, unique=True)
+    name = models.CharField(_('Brand name'), max_length=100)
     
-    image = WebPField(
+    image = WEBPField(
         verbose_name=_('Image'),
         upload_to='brands',
     )
@@ -152,7 +153,7 @@ class Image(models.Model):
         on_delete=models.CASCADE
     )
     
-    image = WebPField(
+    image = WEBPField(
         verbose_name=_('Image'),
         upload_to='brands',
     )
