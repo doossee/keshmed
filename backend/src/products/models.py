@@ -22,7 +22,6 @@ class Brand(models.Model):
     """Brand Model"""
 
     name = models.CharField(_('Brand name'), max_length=100, unique=True)
-    slug = models.SlugField(null=True, blank=True)
     
     image = models.ImageField(
         verbose_name=_('Image'),
@@ -48,10 +47,6 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
     
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
-    
     def get_image(self):
         if self.image:
             return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + self.image.url
@@ -76,7 +71,6 @@ class Category(MPTTModel):
     name_en = models.CharField('Category name', max_length=150)
     name_ru = models.CharField('Название категории', max_length=150)
     name_uz = models.CharField('Toifa nomi', max_length=150)
-    slug = models.SlugField(null=True, blank=True)
     
     parent = TreeForeignKey(
         to='self',
@@ -143,7 +137,7 @@ class Product(TimeStampedModel):
     )
 
     condition = models.CharField(_('Product condition'), max_length=11, choices=CONDITION_CHOICES)
-    year = models.PositiveSmallIntegerField(_('Procuct year'), validators=[MinValueValidator(1000),MaxValueValidator(9999)])
+    year = models.PositiveSmallIntegerField(_('Procuct year'))
     warranty = models.PositiveSmallIntegerField(_('Product warranty'))
 
     shipping_from = models.PositiveSmallIntegerField(_('Shipping Country'))

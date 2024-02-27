@@ -19,7 +19,6 @@ class BrandRetrieveSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            'slug',
             'get_image',
             'get_thumbnail',
             'get_medium_square_crop'
@@ -55,7 +54,6 @@ class AbstractCategorySerializer(serializers.ModelSerializer):
             'name_en',
             'name_ru',
             'name_uz',
-            'slug',
             'parent',
         ]
 
@@ -125,9 +123,6 @@ class ProductRetrieveSerializer(FlexFieldsModelSerializer):
 
     """Product retrieve Serializer"""
 
-    brand = serializers.SlugField(source='brand.slug')
-    category = serializers.SlugField(source='category.slug')
-    
     class Meta:
         model = Product
         fields = '__all__'
