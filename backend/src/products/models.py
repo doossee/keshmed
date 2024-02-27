@@ -13,7 +13,6 @@ from imagekit.processors import ResizeToFill
 from mptt.models import MPTTModel, TreeForeignKey
 
 from src.base.models import TimeStampedModel
-from src.base.fields import WEBPField
 
 
 User = get_user_model() # Get user model
@@ -25,7 +24,7 @@ class Brand(models.Model):
 
     name = models.CharField(_('Brand name'), max_length=100)
     
-    image = WEBPField(
+    image = models.ImageField(
         verbose_name=_('Image'),
         upload_to='brands',
     )
@@ -153,7 +152,7 @@ class Image(models.Model):
         on_delete=models.CASCADE
     )
     
-    image = WEBPField(
+    image = models.ImageField(
         verbose_name=_('Image'),
         upload_to='brands',
     )
