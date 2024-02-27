@@ -2,12 +2,13 @@ import os
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+
+from webpfield.fields import WebPField
 
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -23,21 +24,15 @@ class Brand(models.Model):
 
     name = models.CharField(_('Brand name'), max_length=100, unique=True)
     
-    image = models.ImageField(
+    image = WebPField(
         verbose_name=_('Image'),
         upload_to='brands',
     )
-    thumbnail = models.ImageField(
-        verbose_name=_('Thumbnail'),
-        upload_to='brands/',
-        blank=True,
-        null=True,
-    )
-    medium_square_crop = models.ImageField(
-        verbose_name=_("Medium square crop"),
-        upload_to='brands/',
-        blank=True,
-        null=True,
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(100, 100)],
+        format='WEBP',
+        options={'quality': 60}
     )
 
     class Meta:
@@ -47,22 +42,6 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
     
-    def get_image(self):
-        if self.image:
-            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + self.image.url
-        
-    def get_thumbnail(self):
-        if self.thumbnail:
-            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.thumbnail.url
-        else:
-            return ''
-        
-    def get_medium_square_crop(self):
-        if self.medium_square_crop:
-            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.medium_square_crop.url
-        else:
-            return ''
-
 
 class Category(MPTTModel):
 
@@ -173,21 +152,15 @@ class Image(models.Model):
         on_delete=models.CASCADE
     )
     
-    image = models.ImageField(
+    image = WebPField(
         verbose_name=_('Image'),
-        upload_to='products/',
+        upload_to='brands',
     )
     thumbnail = ImageSpecField(
         source='image',
         processors=[ResizeToFill(100, 100)],
-        format='JPEG',
+        format='WEBP',
         options={'quality': 60}
-    )
-    medium_square_crop = ImageSpecField(
-        source='image',
-        processors=[ResizeToFill(400, 400)],
-        format='JPEG',
-        options={'quality': 80}
     )
 
     class Meta:
@@ -196,22 +169,6 @@ class Image(models.Model):
 
     def __str__(self):
         return f'{self.product.title_en}-{self.id} image'
-
-    def get_image(self):
-        if self.image:
-            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + self.image.url
-        
-    def get_thumbnail(self):
-        if self.thumbnail:
-            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.thumbnail.url
-        else:
-            return ''
-        
-    def get_medium_square_crop(self):
-        if self.medium_square_crop:
-            return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000')  + self.medium_square_crop.url
-        else:
-            return ''
 
 
 # class Rating(TimeStampedModel):

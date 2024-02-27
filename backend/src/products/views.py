@@ -23,25 +23,21 @@ from .models import (
     Image,
 )
 from .serializers import (
-    BrandRetrieveSerializer,
-    BrandCreateSerializer,
+    BrandSerializer,
     AbstractCategorySerializer,
     CategoryTreeSerializer,
-    ImageCreateSerializer,
+    ImageSerializer,
     ProductDefaultSerializer,
     ProductRetrieveSerializer,
 )
 
 
-class BrandViewSet(ReadWriteSerializerMixin, FlexFieldsMixin, viewsets.ModelViewSet):
+class BrandViewSet(viewsets.ModelViewSet):
 
     """Brand Model View Set"""
 
     queryset = Brand.objects.all()
-    serializer_classes = {
-        'read': BrandRetrieveSerializer,
-        'write': BrandCreateSerializer
-    }
+    serializer_class = BrandSerializer
     permission_classes = [IsAdminUser|ReadOnly]
     
 
@@ -77,7 +73,7 @@ class ProductViewSet(
         'default': ProductDefaultSerializer,
         'list': ProductRetrieveSerializer,
         'retrieve': ProductRetrieveSerializer,
-        'create_image': ImageCreateSerializer
+        'create_image': ImageSerializer
     }
     permission_classes = [IsAdminUser|ReadOnly]
     pagination_class = CustomPagination

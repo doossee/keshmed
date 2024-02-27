@@ -10,7 +10,9 @@ from .models import (
 )
 
 
-class BrandRetrieveSerializer(serializers.ModelSerializer):
+class BrandSerializer(serializers.ModelSerializer):
+
+    thumbnail = serializers.SerializerMethodField()
 
     """Brand Serializer"""
 
@@ -19,24 +21,13 @@ class BrandRetrieveSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            'get_image',
-            'get_thumbnail',
-            'get_medium_square_crop'
+            'image',
+            'thumbnail'
         ]
+
+    def get_thumbnail(self, obj):
+        return f"http://127.0.0.1:8000{obj.thumbnail.url}"
         
-
-class BrandCreateSerializer(serializers.ModelSerializer):
-    
-    """Brand serializer for create"""
-
-    class Meta:
-        model = Brand
-        fields = [
-            'id',
-            'name',
-            'image'
-        ]
-
 
 class AbstractCategorySerializer(serializers.ModelSerializer):
 
@@ -83,31 +74,23 @@ class CategoryTreeSerializer(AbstractCategorySerializer):
         fields = meta.fields + ['children']
 
 
-class ImageCreateSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
 
     """Image write serialier"""
+
+    thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = Image
         fields = [
             'id',
             'product',
-            'image'
+            'image',
+            'thumbnail',
         ]
-
-
-class ImageReadSerializer(FlexFieldsModelSerializer):
-
-    """Image read Serializer"""
-
-    class Meta:
-        model = Image
-        fields = [
-           'product',
-           'get_image',
-           'get_thumbnail',
-           'get_medium_square_crop',
-        ]
+    
+    def get_thumbnail(self, obj):
+        return f"http://127.0.0.1:8000{obj.thumbnail.url}"
 
 
 class ProductDefaultSerializer(serializers.ModelSerializer):
@@ -127,7 +110,7 @@ class ProductRetrieveSerializer(FlexFieldsModelSerializer):
         model = Product
         fields = '__all__'
         expandable_fields = {
-            'brand': BrandRetrieveSerializer,
+            'brand': BrandSerializer,
             'category': CategoryExpandSerializer,
-            'images': (ImageReadSerializer, {'many': True}),
+            'images': (ImageSerializer, {'many': True}),
         }

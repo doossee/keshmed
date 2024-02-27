@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = [
     'djoser',
     'corsheaders',
     'django_filters',
+    'imagekit',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
