@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -26,7 +27,7 @@ class BrandSerializer(serializers.ModelSerializer):
         ]
 
     def get_thumbnail(self, obj):
-        return f"http://127.0.0.1:8000{obj.thumbnail.url}"
+        return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + obj.thumbnail.url
         
 
 class AbstractCategorySerializer(serializers.ModelSerializer):
@@ -90,7 +91,7 @@ class ImageSerializer(serializers.ModelSerializer):
         ]
     
     def get_thumbnail(self, obj):
-        return f"http://127.0.0.1:8000{obj.thumbnail.url}"
+        return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + obj.thumbnail.url
 
 
 class ProductDefaultSerializer(serializers.ModelSerializer):
