@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 from rest_framework import serializers
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -7,31 +8,27 @@ from .models import (
     Category,
     Product,
     Image,
-    Rating        
 )
 
 
 class BrandSerializer(serializers.ModelSerializer):
 
-    """Brand Serializer"""
+    thumbnail = serializers.SerializerMethodField()
 
-    thumbnail = serializers.ReadOnlyField(source="thumbnail.url")
-    medium_square_crop = serializers.ReadOnlyField(source="medium_square_crop.url")
+    """Brand Serializer"""
 
     class Meta:
         model = Brand
         fields = [
             'id',
             'name',
-            'description_en',
-            'description_ru',
-            'description_uz',
-            'country',
             'image',
-            'thumbnail',
-            'medium_square_crop'
+            'thumbnail'
         ]
 
+    def get_thumbnail(self, obj):
+        return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + obj.thumbnail.url
+        
 
 class AbstractCategorySerializer(serializers.ModelSerializer):
 
@@ -39,6 +36,7 @@ class AbstractCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
+        # fields = '__all__'
         fields = [
             'id',
             'lft',
@@ -75,24 +73,40 @@ class CategoryTreeSerializer(AbstractCategorySerializer):
     class Meta(AbstractCategorySerializer.Meta):
         meta = AbstractCategorySerializer.Meta
         fields = meta.fields + ['children']
-        
 
-class ImageSerializer(FlexFieldsModelSerializer):
 
-    """Image Serializer"""
+class ImageSerializer(serializers.ModelSerializer):
 
-    thumbnail = serializers.ReadOnlyField(source="thumbnail.url")
-    medium_square_crop = serializers.ReadOnlyField(source="medium_square_crop.url")
+    """Image write serialier"""
+
+    thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = Image
-        fields = '__all__'
-
-
-class ProductSerializer(FlexFieldsModelSerializer):
-
-    """Product Serializer"""
+        fields = [
+            'id',
+            'product',
+            'image',
+            'thumbnail',
+        ]
     
+    def get_thumbnail(self, obj):
+        return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + obj.thumbnail.url
+
+
+class ProductDefaultSerializer(serializers.ModelSerializer):
+
+    """Product default serializer"""
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+        
+
+class ProductRetrieveSerializer(FlexFieldsModelSerializer):
+
+    """Product retrieve Serializer"""
+
     class Meta:
         model = Product
         fields = '__all__'

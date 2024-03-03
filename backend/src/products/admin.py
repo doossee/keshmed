@@ -5,8 +5,8 @@ from .models import (
     Category,
     Product,
     Image,
-    Rating
 )
+
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
@@ -22,8 +22,4 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(Rating)
-class RatingAdmin(admin.ModelAdmin):
     pass
