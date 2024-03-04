@@ -23,11 +23,19 @@ class BrandSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'image',
-            'thumbnail'
+            'thumbnail',
         ]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        if hasattr(instance, 'image') and hasattr(instance.image, 'url'):
+            data['image'] = f"{os.getenv('MEDIA_PREFIX', '')}{instance.image.url}"
+
+        return data
+
     def get_thumbnail(self, obj):
-        return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + obj.thumbnail.url
+        return os.getenv('MEDIA_PREFIX', '') + obj.thumbnail.url  
         
 
 class AbstractCategorySerializer(serializers.ModelSerializer):
@@ -36,7 +44,6 @@ class AbstractCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        # fields = '__all__'
         fields = [
             'id',
             'lft',
@@ -89,9 +96,17 @@ class ImageSerializer(serializers.ModelSerializer):
             'image',
             'thumbnail',
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        if hasattr(instance, 'image') and hasattr(instance.image, 'url'):
+            data['image'] = f"{os.getenv('MEDIA_PREFIX', '')}{instance.image.url}"
+
+        return data
     
     def get_thumbnail(self, obj):
-        return os.getenv('MEDIA_PREFIX', 'http://127.0.0.1:8000') + obj.thumbnail.url
+        return os.getenv('MEDIA_PREFIX', '') + obj.thumbnail.url
 
 
 class ProductDefaultSerializer(serializers.ModelSerializer):
